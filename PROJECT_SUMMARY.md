@@ -33,7 +33,7 @@ NOS是一个用C语言编写的简单教学操作系统，运行在RISC-V 64位�
 - `kernel/main.c`: 内核初始化和主函数
 
 #### 架构相关 (kernel/arch/riscv/)
-- `kernel/arch/riscv/trap.S`: 中断/异常入口和上下文保存
+- `kernel/arch/riscv/trapentry.S`: 中断/异常入口和上下文保存
 - `kernel/arch/riscv/trap.c`: 中断处理逻辑
 - `kernel/arch/riscv/switch.S`: 进程上下文切换
 
