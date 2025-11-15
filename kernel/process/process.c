@@ -159,11 +159,14 @@ void process_init(void) {
 
     printk("  Process management initialized\n");
 
-    /* 创建测试进程 */
+    /* 暂时不创建测试进程，让系统先启动到shell */
+    /* TODO: 在完善中断和调度后再启用进程调度 */
+    /*
     create_process("idle", idle_process);
     create_process("test1", test_process_1);
     create_process("test2", test_process_2);
-
-    /* 启动调度 */
     schedule();
+    */
+
+    printk("  (Process scheduling disabled for now)\n");
 }

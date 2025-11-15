@@ -20,7 +20,18 @@ static uint64_t first_free_page;
 void pmm_init(void) {
     /* 计算内核结束后的第一个可用页 */
     uint64_t kernel_end_addr = (uint64_t)kernel_end;
-    first_free_page = PAGE_ALIGN_UP(kernel_end_addr - KERNEL_BASE) / PAGE_SIZE;
+
+    printk("  Kernel end address: %p\n", kernel_end_addr);
+    printk("  Kernel base: %p\n", KERNEL_BASE);
+
+    /* 计算内核占用的大小 */
+    if (kernel_end_addr < KERNEL_BASE) {
+        printk("  ERROR: kernel_end < KERNEL_BASE!\n");
+        kernel_end_addr = KERNEL_BASE + (1 * 1024 * 1024); /* 假设1MB */
+    }
+
+    uint64_t kernel_size = kernel_end_addr - KERNEL_BASE;
+    first_free_page = PAGE_ALIGN_UP(kernel_size) / PAGE_SIZE;
 
     total_pages = MAX_PAGES;
     free_pages = total_pages - first_free_page;
@@ -33,8 +44,9 @@ void pmm_init(void) {
         page_bitmap[i / 8] |= (1 << (i % 8));
     }
 
-    printk("  Physical memory: %u MB\n", MEMORY_SIZE / 1024 / 1024);
-    printk("  Total pages: %u, Free pages: %u\n", total_pages, free_pages);
+    printk("  Physical memory: %d MB\n", MEMORY_SIZE / 1024 / 1024);
+    printk("  Total pages: %d, Free pages: %d\n", (int)total_pages, (int)free_pages);
+    printk("  First free page: %d\n", (int)first_free_page);
 }
 
 void *alloc_page(void) {
