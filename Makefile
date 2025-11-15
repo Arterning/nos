@@ -8,7 +8,7 @@ OBJCOPY = $(CROSS_COMPILE)objcopy
 
 # 编译选项
 CFLAGS = -Wall -Wextra -O2 -ffreestanding -nostdlib -nostdinc
-CFLAGS += -mcmodel=medany -march=rv64imac -mabi=lp64
+CFLAGS += -mcmodel=medany -march=rv64imac_zicsr -mabi=lp64
 CFLAGS += -I./include
 
 LDFLAGS = -nostdlib
