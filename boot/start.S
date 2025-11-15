@@ -7,11 +7,8 @@ _start:
     csrw sie, zero
     csrw sip, zero
 
-    /* 设置栈指针 (每个hart使用独立的栈) */
-    csrr t0, mhartid
-    bnez t0, park_hart    /* 只使用hart 0 */
-
-    /* 设置栈 */
+    /* 设置栈指针 */
+    /* OpenSBI已经处理了多核，我们在hart 0上运行 */
     la sp, stack_top
 
     /* 清空BSS段 */
@@ -28,9 +25,9 @@ _start:
     call kernel_main
 
     /* 如果返回，永久休眠 */
-park_hart:
+1:
     wfi
-    j park_hart
+    j 1b
 
     .section .bss
     .align 16

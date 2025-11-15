@@ -69,7 +69,7 @@ clean:
 # 在QEMU中运行
 run: $(BINARY)
 	@echo "Starting QEMU..."
-	qemu-system-riscv64 -machine virt -bios none \
+	qemu-system-riscv64 -machine virt -bios default \
 		-kernel $(TARGET) -nographic
 
 # 调试模式
