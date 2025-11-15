@@ -5,8 +5,8 @@
     .align 4
 
 trap_vector:
-    /* 保存上下文到栈 */
-    addi sp, sp, -272
+    /* 保存上下文到栈 (32个寄存器 + 4个CSR = 288字节) */
+    addi sp, sp, -288
 
     /* 保存所有寄存器 */
     sd ra, 0(sp)
@@ -95,6 +95,6 @@ trap_return:
     ld t6, 240(sp)
 
     ld sp, 8(sp)
-    addi sp, sp, 272
+    addi sp, sp, 288
 
     sret

@@ -77,14 +77,17 @@ static int parse_args(char *cmd, char **argv) {
 /* 命令: help */
 static void cmd_help(void) {
     printk("Available commands:\n");
-    printk("  help       - Show this help message\n");
-    printk("  ls         - List files\n");
-    printk("  cat <file> - Display file contents\n");
-    printk("  ps         - List processes\n");
-    printk("  mem        - Show memory info\n");
-    printk("  echo <msg> - Print a message\n");
-    printk("  clear      - Clear screen\n");
-    printk("  about      - About NOS\n");
+    printk("  help         - Show this help message\n");
+    printk("  ls           - List files\n");
+    printk("  cat <file>   - Display file contents\n");
+    printk("  touch <file> - Create a new file\n");
+    printk("  rm <file>    - Remove a file\n");
+    printk("  write <file> - Write to a file\n");
+    printk("  ps           - List processes\n");
+    printk("  mem          - Show memory info\n");
+    printk("  echo <msg>   - Print a message\n");
+    printk("  clear        - Clear screen\n");
+    printk("  about        - About NOS\n");
 }
 
 /* 命令: ls */
@@ -156,6 +159,74 @@ static void cmd_clear(void) {
     printk("\033[2J\033[H");  /* ANSI清屏 */
 }
 
+/* 命令: touch - 创建文件 */
+static void cmd_touch(int argc, char **argv) {
+    if (argc < 2) {
+        printk("Usage: touch <filename>\n");
+        return;
+    }
+
+    if (fs_create(argv[1], FILE_TYPE_REGULAR) == 0) {
+        printk("File created: %s\n", argv[1]);
+    } else {
+        printk("Failed to create file: %s\n", argv[1]);
+    }
+}
+
+/* 命令: rm - 删除文件 */
+static void cmd_rm(int argc, char **argv) {
+    if (argc < 2) {
+        printk("Usage: rm <filename>\n");
+        return;
+    }
+
+    if (fs_delete(argv[1]) == 0) {
+        printk("File removed: %s\n", argv[1]);
+    } else {
+        printk("Failed to remove file: %s\n", argv[1]);
+    }
+}
+
+/* 命令: write - 写入文件 */
+static void cmd_write(int argc, char **argv) {
+    if (argc < 2) {
+        printk("Usage: write <filename>\n");
+        printk("Then enter text (press Ctrl+D or empty line to finish)\n");
+        return;
+    }
+
+    char content[1024];
+    int pos = 0;
+
+    printk("Enter text (empty line to finish):\n");
+
+    while (pos < (int)sizeof(content) - 1) {
+        char line[128];
+        printk("> ");
+        readline(line, sizeof(line));
+
+        if (strlen(line) == 0) {
+            break;  /* 空行结束 */
+        }
+
+        /* 添加这行到内容 */
+        int len = strlen(line);
+        if (pos + len + 1 < (int)sizeof(content)) {
+            strcpy(&content[pos], line);
+            pos += len;
+            content[pos++] = '\n';
+        }
+    }
+
+    content[pos] = '\0';
+
+    if (fs_write(argv[1], content, pos) >= 0) {
+        printk("Written %d bytes to %s\n", pos, argv[1]);
+    } else {
+        printk("Failed to write to file: %s\n", argv[1]);
+    }
+}
+
 /* 命令: about */
 static void cmd_about(void) {
     printk("\n");
@@ -188,6 +259,12 @@ static void execute_command(char *cmd) {
         cmd_ls();
     } else if (strcmp(argv[0], "cat") == 0) {
         cmd_cat(argc, argv);
+    } else if (strcmp(argv[0], "touch") == 0) {
+        cmd_touch(argc, argv);
+    } else if (strcmp(argv[0], "rm") == 0) {
+        cmd_rm(argc, argv);
+    } else if (strcmp(argv[0], "write") == 0) {
+        cmd_write(argc, argv);
     } else if (strcmp(argv[0], "ps") == 0) {
         cmd_ps();
     } else if (strcmp(argv[0], "mem") == 0) {
